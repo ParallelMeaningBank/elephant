@@ -1,0 +1,6 @@
+
+B
+
+# code unigrams in width-1 window
+U:code-1X=%X[0,0]
+

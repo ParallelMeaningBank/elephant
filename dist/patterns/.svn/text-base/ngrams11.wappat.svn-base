@@ -1,0 +1,46 @@
+
+B
+
+# code unigrams in width-7 window
+U:code-1LLL=%X[-3,0]
+U:code-1LL =%X[-2,0]
+U:code-1L  =%X[-1,0]
+U:code-1X  =%X[0,0]
+U:code-1R  =%X[1,0]
+U:code-1RR =%X[2,0]
+U:code-1RRR=%X[3,0]
+
+# code bigrams in width-7 window
+U:code-2LLL=%X[-3,0]/%X[-2,0]
+U:code-2LL =%X[-2,0]/%X[-1,0]
+U:code-2L  =%X[-1,0]/%X[0,0]
+U:code-2X  =%X[0,0]/%X[1,0]
+U:code-2R  =%X[1,0]/%X[2,0]
+U:code-2RR =%X[2,0]/%X[3,0]
+
+# code trigrams in width-9 window
+U:code-3LLLL=%X[-4,0]/%X[-3,0]/%X[-2,0]
+U:code-3LLL =%X[-3,0]/%X[-2,0]/%X[-1,0]
+U:code-3LL  =%X[-2,0]/%X[-1,0]/%X[0,0]
+U:code-3L   =%X[-1,0]/%X[0,0]/%X[1,0]
+U:code-3X   =%X[0,0]/%X[1,0]/%X[2,0]
+U:code-3R   =%X[1,0]/%X[2,0]/%X[3,0]
+U:code-3RR  =%X[2,0]/%X[3,0]/%X[4,0]
+
+# code 4-grams in width-9 window
+U:code-4LLLL=%X[-4,0]/%X[-3,0]/%X[-2,0]/%X[-1,0]
+U:code-4LLL =%X[-3,0]/%X[-2,0]/%X[-1,0]/%X[0,0]
+U:code-4LL  =%X[-2,0]/%X[-1,0]/%X[0,0]/%X[1,0]
+U:code-4L   =%X[-1,0]/%X[0,0]/%X[1,0]/%X[2,0]
+U:code-4X   =%X[0,0]/%X[1,0]/%X[2,0]/%X[3,0]
+U:code-4R   =%X[1,0]/%X[2,0]/%X[3,0]/%X[4,0]
+
+# code 5-grams in width-11 window
+U:code-5LLLLL=%X[-5,0]/%X[-4,0]/%X[-3,0]/%X[-2,0]/%X[-1,0]
+U:code-5LLLL =%X[-4,0]/%X[-3,0]/%X[-2,0]/%X[-1,0]/%X[0,0]
+U:code-5LLL  =%X[-3,0]/%X[-2,0]/%X[-1,0]/%X[0,0]/%X[1,0]
+U:code-5LL   =%X[-2,0]/%X[-1,0]/%X[0,0]/%X[1,0]/%X[2,0]
+U:code-5L    =%X[-1,0]/%X[0,0]/%X[1,0]/%X[2,0]/%X[3,0]
+U:code-5X    =%X[0,0]/%X[1,0]/%X[2,0]/%X[3,0]/%X[4,0]
+U:code-5R    =%X[1,0]/%X[2,0]/%X[3,0]/%X[4,0]/%X[5,0]
+

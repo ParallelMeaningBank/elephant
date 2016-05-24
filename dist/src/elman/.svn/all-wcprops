@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/elephant/!svn/ver/191/dist/src/elman
+END
+elman.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/elephant/!svn/ver/63/dist/src/elman/elman.cpp
+END
+makefile
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/elephant/!svn/ver/30/dist/src/elman/makefile
+END
+rnnlmlib.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/elephant/!svn/ver/63/dist/src/elman/rnnlmlib.cpp
+END
+rnnlmlib.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/elephant/!svn/ver/63/dist/src/elman/rnnlmlib.h
+END
+example.sh
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/elephant/!svn/ver/30/dist/src/elman/example.sh
+END

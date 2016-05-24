@@ -1,0 +1,10 @@
+
+B
+
+# code unigrams in width-1 window
+U:code-1X=%X[0,0]
+
+
+# cat unigrams in width-1 window
+U:cat-1X=%X[0,1]
+

@@ -1,0 +1,192 @@
+#!/usr/bin/env python
+# elephant
+"""
+Elephant is a statistical sentence and word boundaries detection system.
+Wapiti needs to be installed and in the path in order to use elephant.
+"""
+
+from optparse import OptionParser
+import sys
+import os
+from subprocess import Popen, PIPE
+from tempfile import mkstemp
+import codecs                # For utf-8 output
+import unicodedata as ud     
+import itertools
+
+
+def paras(src):
+    "Splits src into paragraphs separated by newlines"
+    current = []
+    for line in src:
+        if line.strip() == "":
+            yield current
+            current = []
+        else: 
+            current.append(line)
+
+def is_exe(fpath):
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+def check_exec(program):
+    """Checks if 'program' exists in the path and it is executable."""
+    
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return True
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return True
+
+    return False
+
+def create_replacement_function(vocab_model=None):
+    REPLACEMENT=65533
+    if vocab_model:
+        vocab = set(map(int,open(vocab_model).read().split()))
+        replace = lambda code: code if code in vocab else REPLACEMENT
+    else:
+        replace = lambda code: code
+    return replace
+
+def label(text, model, elman_model=None, vocab_model=None):
+    """This function takes an input text, a wapiti model, an elman
+    model and and vocab model, and calls wapiti to label the
+    characters. It then returns the tokenized text."""
+    def parse(line):
+        fs = line.split()
+        return (fs[0], fs[-1])
+    replace = create_replacement_function()
+    # write the input text on a temporary file for wapiti
+    tmp_input, tmp_input_file = mkstemp()
+    fd = open(tmp_input_file, 'w')
+    if elman_model: # Add rnn features
+        for (ch,features) in zip(text, augment(text, elman_model, replace)):
+            fd.write('{0} {1} {2}\n'.format(ord(ch), ud.category(ch), features))
+    else:        # Just character codes and categories
+        for ch in text:
+            fd.write('{0} {1}\n'.format(ord(ch), ud.category(ch)))
+    fd.close()
+    # print tmp_input_file
+    # call wapiti
+    if not check_exec('wapiti'):
+        raise RuntimeError("Unable to run wapiti")
+    process = Popen(['wapiti', 'label', '-m', model, tmp_input_file], stdout=PIPE, stderr=PIPE)
+    output = process.communicate()[0][:-2]
+    os.unlink(tmp_input_file)
+    return map(parse, output.split('\n'))
+
+
+def augment(text, elman_model, replace):
+    """Takes an input text and an elman model and calls
+    elman to output hidden layer activation for each character. It
+    then extracts and returns binary features for use with wapiti."""
+    
+    # write the input text on a temporary file for elman
+    tmp_input, tmp_input_file = mkstemp()
+    fd = open(tmp_input_file, 'w')
+    for ch in text:
+        fd.write('{0} '.format(replace(ord(ch))))
+    fd.write("\n")
+    fd.close()
+    os.close(tmp_input)
+
+    # call elman
+    if not check_exec('elman'):
+        raise RuntimeError("Unable to run elman")
+    process = Popen(['elman', '-rnnlm',  elman_model, '-hidden-feature-size', '10',\
+                     '-print-hidden', '-test', tmp_input_file], \
+                        stdout=PIPE, stderr=PIPE)
+    output = process.communicate()[0][:-2]
+    os.unlink(tmp_input_file)
+    return output.split('\n')
+    
+def checks(model):
+    errors = []
+    
+    # check for wapiti
+    if not check_exec('wapiti'):
+        errors.append('unable to run wapiti')
+    
+    # check for model file
+    if not (os.path.isfile(model) and os.access(model, os.R_OK)):
+        errors.append('unable to read model file {0}'.format(model))
+    
+    return len(errors) == 0, errors
+
+def check_model_type(modeldir):
+    """Checks if modeldir is a simple wapiti model or an elman+wapiti
+    model or an elman+vocab+wapiti model. Returns paths to all model
+    files (None for elman and vocab if not present)."""
+    wapiti_model =  os.path.join(modeldir,"wapiti")
+    elman_model = os.path.join(modeldir, "elman")
+    vocab_model = os.path.join(modeldir, "vocab")
+    # Wapiti model must exist and be readable
+    if not os.access(wapiti_model, os.R_OK):
+        raise RuntimeError("Cannot read {0}".format(wapiti_model))
+    # If elman model exists, it must be readable
+    if  os.path.isfile(elman_model) and \
+        not os.access(elman_model, os.R_OK):
+        raise RuntimeError("Cannot read {0}".format(elman_model))
+    # If elman model does not exist, it won't be used so set it to None
+    if not os.path.isfile(elman_model):
+        elman_model = None
+    # If vocab exists, it must be readable
+    if  os.path.isfile(vocab_model) and \
+        not os.access(vocab_model, os.R_OK):
+        raise RuntimeError("Cannot read {0}".format(vocab_model))
+    # If vocab model does not exist, it won't be used so set it to None
+    if not os.path.isfile(vocab_model):
+        vocab_model = None
+
+    return ( wapiti_model, elman_model, vocab_model)
+    
+def output_labels(labeled, iob=False):
+    """Output the tokenized text in either traditional format 
+    (whitespace-separated tokens, one sentence per line) or in vertical 
+    format with IOB tags"""
+    out = codecs.getwriter("utf-8")(sys.stdout)
+    if iob:
+        for ch, label in labeled:
+            out.write(u'{0}\t{1}\n'.format(int(ch), label))
+    else:
+        first = True
+        for ch, label in labeled:
+            if label == 'S':
+                if not first:
+                    out.write(u'\n')
+                first = False
+            if label == 'T':
+                out.write(u' ')
+            if label in 'STI':
+                out.write(unichr(int(ch)))  
+
+if __name__ == '__main__':
+    # parse command line options
+    usage = "usage: %prog -m MODEL_DIR [options] < INPUT_FILE"
+    parser = OptionParser(usage=usage)
+    parser.add_option('-m', '--model', dest='model_dir',
+            help='directory containing the model files to use')
+    parser.add_option('-f', '--format', dest='format', default='',
+            help='output format: "normal" (default) or "iob"')
+    (options, args) = parser.parse_args()
+    if not (options.model_dir):
+        parser.print_help()
+        sys.exit(1)
+    model_dir = options.model_dir
+    iob =  options.format == 'iob'
+    
+    # check type of model
+    wapiti_model, elman_model, vocab_model = check_model_type(options.model_dir)
+    os.environ["PATH"] += os.pathsep + os.pathsep.join([os.path.dirname(os.path.abspath(__file__)),"ext"])
+    
+    # tokenize the input text
+    inp = codecs.getreader("utf-8")(sys.stdin)
+    labeled = label(inp.read(), wapiti_model, elman_model, vocab_model)
+    output_labels(labeled, iob=iob)
+    
+

@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat
+END
+chpattern.txt
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/chpattern.txt
+END
+chtrain.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/chtrain.txt
+END
+chtest.txt
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/chtest.txt
+END
+nppattern.txt
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/nppattern.txt
+END
+nptrain.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/nptrain.txt
+END
+nptest.txt
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/nptest.txt
+END
+pattern.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/pattern.txt
+END
+train.txt
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/train.txt
+END
+test.txt
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/elephant/!svn/ver/30/dist/src/wapiti/dat/test.txt
+END

@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/elephant/!svn/ver/190/dist/patterns
+END
+ngram7.txt
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/elephant/!svn/ver/190/dist/patterns/ngram7.txt
+END
+ngram7-top10.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/elephant/!svn/ver/190/dist/patterns/ngram7-top10.txt
+END
+code5.txt
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/elephant/!svn/ver/190/dist/patterns/code5.txt
+END
+code5-top10.txt
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/elephant/!svn/ver/190/dist/patterns/code5-top10.txt
+END
+code7.txt
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/elephant/!svn/ver/190/dist/patterns/code7.txt
+END
+code7-top10.txt
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/elephant/!svn/ver/190/dist/patterns/code7-top10.txt
+END
+code9.txt
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/elephant/!svn/ver/190/dist/patterns/code9.txt
+END
+cat0.wappat
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/elephant/!svn/ver/190/dist/patterns/cat0.wappat
+END
+code9-top10.txt
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/elephant/!svn/ver/190/dist/patterns/code9-top10.txt
+END
+cat1.wappat
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/elephant/!svn/ver/190/dist/patterns/cat1.wappat
+END
+ngrams11.wappat
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/elephant/!svn/ver/190/dist/patterns/ngrams11.wappat
+END
+ngrams11-top10.wappat
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/elephant/!svn/ver/190/dist/patterns/ngrams11-top10.wappat
+END
+ngram5.txt
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/elephant/!svn/ver/190/dist/patterns/ngram5.txt
+END
+ngram5-top10.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/elephant/!svn/ver/190/dist/patterns/ngram5-top10.txt
+END
