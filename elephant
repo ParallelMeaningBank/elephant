@@ -71,6 +71,7 @@ def label(text, model, elman_model=None, vocab_model=None):
         for ch in text:
             fd.write('{0} {1}\n'.format(ord(ch), ud.category(ch)))
     fd.close()
+    os.close(tmp_input)
     # print tmp_input_file
     # call wapiti
     if not check_exec('wapiti'):
