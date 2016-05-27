@@ -57,6 +57,9 @@ def label(text, model, elman_model=None, vocab_model=None):
     """This function takes an input text, a wapiti model, an elman
     model and and vocab model, and calls wapiti to label the
     characters. It then returns the tokenized text."""
+    # If text is empty, return empty string
+    if not text:
+        return ''
     def parse(line):
         fs = line.split()
         return (fs[0], fs[-1])
