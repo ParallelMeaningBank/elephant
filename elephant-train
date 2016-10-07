@@ -94,7 +94,7 @@ if __name__ == '__main__':
     # prepare output directory
     makedirs(model_dir)
     if elman_model:
-        shutil.copy(elman_model, model_dir)
+        shutil.copy(elman_model, os.path.join(model_dir, 'elman'))
     tmp_input_file = create_tmp_file(input_iob_file)
     if devel_iob_file:
         tmp_devel_file = create_tmp_file(devel_iob_file)
