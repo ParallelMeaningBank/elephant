@@ -149,7 +149,7 @@ def check_model_type(modeldir):
 
     return ( wapiti_model, elman_model, vocab_model)
     
-def output_labels(labeled, iob=False):
+def output_labels(labeled, iob=False, first = True):
     """Output the tokenized text in either traditional format 
     (whitespace-separated tokens, one sentence per line) or in vertical 
     format with IOB tags"""
@@ -158,7 +158,7 @@ def output_labels(labeled, iob=False):
         for ch, label in labeled:
             out.write(u'{0}\t{1}\n'.format(int(ch), label))
     else:
-        first = True
+        first = first
         for ch, label in labeled:
             if label == 'S':
                 if not first:
@@ -177,6 +177,9 @@ if __name__ == '__main__':
             help='directory containing the model files to use')
     parser.add_option('-f', '--format', dest='format', default='',
             help='output format: "normal" (default) or "iob"')
+    parser.add_option('-c', '--chunk-input', dest='chunk_input', default=0,
+            type=int, metavar="CHUNK_SIZE_KB", help="chunk the input in n-KB-sized chunks to \
+reduce Elephant's RAM usage. Max_RAM_usage_MB ~ 4*size_of_models_MB+0.7*chunk_size_KB")
     (options, args) = parser.parse_args()
     if not (options.model_dir):
         parser.print_help()
@@ -189,8 +192,22 @@ if __name__ == '__main__':
     os.environ["PATH"] += os.pathsep + os.pathsep.join([os.path.dirname(os.path.abspath(__file__)),"ext"])
     
     # tokenize the input text
-    inp = codecs.getreader("utf-8")(sys.stdin)
-    labeled = label(inp.read(), wapiti_model, elman_model, vocab_model)
-    output_labels(labeled, iob=iob)
-    
+    if options.chunk_input > 0:
+        inp = sys.stdin # codecs.getreader doesn't support sizehint in readlines()
+        first = True
+        # Cycle through input while it lasts, keep lines in input intact
+        while True:
+            text = unicode(''.join(inp.readlines(options.chunk_input*1000)), 'utf-8')
+            if not text:
+                break
+            labeled = label(text, wapiti_model, elman_model, vocab_model)
+            output_labels(labeled, iob=iob, first=first)
+            first = False
+    elif options.chunk_input < 0:
+        parser.print_help()
+        sys.exit(1)
+    else:
+        inp = codecs.getreader("utf-8")(sys.stdin)
+        labeled = label(inp.read(), wapiti_model, elman_model, vocab_model)
+        output_labels(labeled, iob=iob)
 
