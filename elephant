@@ -14,9 +14,8 @@ import codecs                # For utf-8 output
 import unicodedata as ud     
 import itertools
 
-
 def paras(src):
-    "Splits src into paragraphs separated by newlines"
+    "Splits src into paragraphs separated by empty lines"
     current = []
     for line in src:
         if line.strip() == "":
@@ -24,6 +23,8 @@ def paras(src):
             current = []
         else: 
             current.append(line)
+    if current:
+        yield current
 
 def is_exe(fpath):
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -157,6 +158,7 @@ def output_labels(labeled, iob=False, first = True):
     if iob:
         for ch, label in labeled:
             out.write(u'{0}\t{1}\n'.format(int(ch), label))
+        out.write(u'\n')
     else:
         first = first
         for ch, label in labeled:
@@ -177,12 +179,17 @@ if __name__ == '__main__':
             help='directory containing the model files to use')
     parser.add_option('-f', '--format', dest='format', default='',
             help='output format: "normal" (default) or "iob"')
+    parser.add_option('-F', '--input-format', dest='input_format', default='',
+            help='input format: "normal" (default) or "iob"')
     parser.add_option('-c', '--chunk-input', dest='chunk_input', default=0,
             type=int, metavar="CHUNK_SIZE_KB", help="chunk the input in n-KB-sized chunks to \
 reduce Elephant's RAM usage. Max_RAM_usage_MB ~ 4*size_of_models_MB+0.7*chunk_size_KB")
     (options, args) = parser.parse_args()
     if not (options.model_dir):
         parser.print_help()
+        sys.exit(1)
+    if options.chunk_input > 0 and options.input_format == 'iob':
+        print >> sys.stderr, 'ERROR: chunking input unsupported for IOB format'
         sys.exit(1)
     model_dir = options.model_dir
     iob =  options.format == 'iob'
@@ -206,6 +213,14 @@ reduce Elephant's RAM usage. Max_RAM_usage_MB ~ 4*size_of_models_MB+0.7*chunk_si
     elif options.chunk_input < 0:
         parser.print_help()
         sys.exit(1)
+    elif options.input_format == 'iob':
+        def line_to_character(line):
+            code, label = line.split()
+            return unichr(int(code))
+        for para in paras(sys.stdin):
+            text = ''.join(line_to_character(line) for line in para)
+            labeled = label(text, wapiti_model, elman_model, vocab_model)
+            output_labels(labeled, iob=iob)
     else:
         inp = codecs.getreader("utf-8")(sys.stdin)
         labeled = label(inp.read(), wapiti_model, elman_model, vocab_model)
