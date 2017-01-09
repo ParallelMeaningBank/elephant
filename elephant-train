@@ -105,7 +105,7 @@ if __name__ == '__main__':
             wapiti_pattern_file, tmp_input_file, wapiti_model]
     if devel_iob_file:
         command.append('--devel')
-        command.append(temp_devel_file)
+        command.append(tmp_devel_file)
         command.append('--stopwin')
         command.append('20')
     subprocess.call(command)
