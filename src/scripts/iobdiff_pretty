@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+
+"""
+Input: unified diff between two IOB files
+Output: a readable, horizontal presentation of each difference
+"""
+
+import codecs
+import sys
+
+from itertools import chain
+
+out = codecs.getwriter('UTF-8')(sys.stdout)
+
+class Line:
+
+    def __init__(self, linetype, char, label):
+        self.linetype = linetype
+        self.char = char
+        self.label = label
+
+def analyze(line):
+    linetype = line[0]
+    #sys.stderr.write('~%s~' % line[1:].rstrip())
+    try:
+        char, label = line[1:].rstrip().split(' ')
+    except ValueError:
+        char, label = 10, ' '
+    char = int(char)
+    return Line(linetype, char, label)
+
+def pretty_print(lines):
+    lines = map(analyze, lines)
+    for line in lines:
+        if line.linetype in (' ', '-'):
+            out.write(unichr(line.char).replace('\n', ' '))
+    out.write('\n')
+    for line in lines:
+        if line.linetype in (' ', '-'):
+            out.write(line.label)
+    out.write('\n')
+    for line in lines:
+        if line.linetype in (' ', '+'):
+            out.write(line.label)
+    out.write('\n\n')
+
+current_difference = []
+
+for line in chain(sys.stdin, ['@']):
+    if line.startswith('@'):
+        if current_difference:
+            pretty_print(current_difference)
+            current_difference = []
+    else:
+        current_difference.append(line)
