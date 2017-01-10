@@ -65,25 +65,18 @@ def label(text, model, elman_model=None, vocab_model=None):
         fs = line.split()
         return (fs[0], fs[-1])
     replace = create_replacement_function()
-    # write the input text on a temporary file for wapiti
-    tmp_input, tmp_input_file = mkstemp()
-    fd = open(tmp_input_file, 'w')
+    # write the input text to a string for wapiti
     if elman_model: # Add rnn features
-        for (ch,features) in zip(text, augment(text, elman_model, replace)):
-            fd.write('{0} {1} {2}\n'.format(ord(ch), ud.category(ch), features))
+        wapiti_input = ''.join('{0} {1} {2}\n'.format(ord(ch), ud.category(ch), features) for (ch, features) in zip(text, augment(text, elman_model, replace)))
     else:        # Just character codes and categories
-        for ch in text:
-            fd.write('{0} {1}\n'.format(ord(ch), ud.category(ch)))
-    fd.close()
-    os.close(tmp_input)
-    # print tmp_input_file
+        wapiti_input = ''.join('{0} {1}\n'.format(ord(ch), ud.category(ch)) for ch in text)
     # call wapiti
     if not check_exec('wapiti'):
         raise RuntimeError("Unable to run wapiti")
-    process = Popen(['wapiti', 'label', '-m', model, tmp_input_file], stdout=PIPE, stderr=PIPE)
-    output = process.communicate()[0][:-2]
-    os.unlink(tmp_input_file)
-    return map(parse, output.split('\n'))
+    process = Popen(['wapiti', 'label', '-m', model], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    process.stdin.write(wapiti_input)
+    process.stdin.close()
+    return map(parse, (line.rstrip() for line in process.stdout if line.rstrip()))
 
 
 def augment(text, elman_model, replace):
