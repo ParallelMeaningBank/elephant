@@ -17,7 +17,8 @@ import itertools
 def paras(src):
     "Splits src into paragraphs separated by empty lines"
     current = []
-    for line in src:
+    while True:
+        line = src.readline()
         if line.strip() == "":
             yield current
             current = []
@@ -166,6 +167,7 @@ def output_labels(labeled, iob=False, first = True):
                 out.write(u' ')
             if label in 'STI':
                 out.write(unichr(int(ch)))  
+    out.flush()
 
 if __name__ == '__main__':
     # parse command line options
