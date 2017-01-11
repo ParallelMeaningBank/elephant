@@ -54,8 +54,8 @@ def create_replacement_function(vocab_model=None):
         replace = lambda code: code
     return replace
 
-def label(text, model, elman_model=None, vocab_model=None):
-    """This function takes an input text, a wapiti model, an elman
+def label(text, process, elman_model=None, vocab_model=None):
+    """This function takes an input text, a wapiti process, an elman
     model and and vocab model, and calls wapiti to label the
     characters. It then returns the tokenized text."""
     # If text is empty, return empty string
@@ -71,13 +71,8 @@ def label(text, model, elman_model=None, vocab_model=None):
     else:        # Just character codes and categories
         wapiti_input_lines = ['{0} {1}\n'.format(ord(ch), ud.category(ch)) for ch in text]
     wapiti_input_lines.append('\n')
-    # call wapiti
-    if not check_exec('wapiti'):
-        raise RuntimeError("Unable to run wapiti")
-    process = Popen(['wapiti', 'label', '-m', model], stdin=PIPE, stdout=PIPE, stderr=PIPE)
     for line in wapiti_input_lines:
         process.stdin.write(line)
-    process.stdin.close()
     result = []
     while True:
         line = process.stdout.readline()
@@ -198,6 +193,11 @@ reduce Elephant's RAM usage. Max_RAM_usage_MB ~ 4*size_of_models_MB+0.7*chunk_si
     # check type of model
     wapiti_model, elman_model, vocab_model = check_model_type(options.model_dir)
     os.environ["PATH"] += os.pathsep + os.pathsep.join([os.path.dirname(os.path.abspath(__file__)),"ext"])
+
+    # call wapiti
+    if not check_exec('wapiti'):
+        raise RuntimeError("Unable to run wapiti")
+    wapiti_process = Popen(['wapiti', 'label', '-m', wapiti_model], stdin=PIPE, stdout=PIPE, stderr=PIPE)
     
     # tokenize the input text
     if options.chunk_input > 0:
@@ -208,7 +208,7 @@ reduce Elephant's RAM usage. Max_RAM_usage_MB ~ 4*size_of_models_MB+0.7*chunk_si
             text = unicode(''.join(inp.readlines(options.chunk_input*1000)), 'utf-8')
             if not text:
                 break
-            labeled = label(text, wapiti_model, elman_model, vocab_model)
+            labeled = label(text, wapiti_process, elman_model, vocab_model)
             output_labels(labeled, iob=iob, first=first)
             first = False
     elif options.chunk_input < 0:
@@ -220,10 +220,10 @@ reduce Elephant's RAM usage. Max_RAM_usage_MB ~ 4*size_of_models_MB+0.7*chunk_si
             return unichr(int(code))
         for para in paras(sys.stdin):
             text = ''.join(line_to_character(line) for line in para)
-            labeled = label(text, wapiti_model, elman_model, vocab_model)
+            labeled = label(text, wapiti_process, elman_model, vocab_model)
             output_labels(labeled, iob=iob)
     else:
         inp = codecs.getreader("utf-8")(sys.stdin)
-        labeled = label(inp.read(), wapiti_model, elman_model, vocab_model)
+        labeled = label(inp.read(), wapiti_process, elman_model, vocab_model)
         output_labels(labeled, iob=iob)
 
