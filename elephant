@@ -67,17 +67,25 @@ def label(text, model, elman_model=None, vocab_model=None):
     replace = create_replacement_function()
     # write the input text to a string for wapiti
     if elman_model: # Add rnn features
-        wapiti_input = ''.join('{0} {1} {2}\n'.format(ord(ch), ud.category(ch), features) for (ch, features) in zip(text, augment(text, elman_model, replace)))
+        wapiti_input_lines = ['{0} {1} {2}\n'.format(ord(ch), ud.category(ch), features) for (ch, features) in zip(text, augment(text, elman_model, replace))]
     else:        # Just character codes and categories
-        wapiti_input = ''.join('{0} {1}\n'.format(ord(ch), ud.category(ch)) for ch in text)
+        wapiti_input_lines = ['{0} {1}\n'.format(ord(ch), ud.category(ch)) for ch in text]
+    wapiti_input_lines.append('\n')
     # call wapiti
     if not check_exec('wapiti'):
         raise RuntimeError("Unable to run wapiti")
     process = Popen(['wapiti', 'label', '-m', model], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    process.stdin.write(wapiti_input)
+    for line in wapiti_input_lines:
+        process.stdin.write(line)
     process.stdin.close()
-    return map(parse, (line.rstrip() for line in process.stdout if line.rstrip()))
-
+    result = []
+    while True:
+        line = process.stdout.readline()
+        if line.rstrip() == '':
+            break
+        else:
+            result.append(parse(line.rstrip()))
+    return result
 
 def augment(text, elman_model, replace):
     """Takes an input text and an elman model and calls
