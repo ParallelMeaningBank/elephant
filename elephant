@@ -216,8 +216,7 @@ reduce Elephant's RAM usage. Max_RAM_usage_MB ~ 4*size_of_models_MB+0.7*chunk_si
         sys.exit(1)
     elif options.input_format == 'iob':
         def line_to_character(line):
-            code, label = line.split()
-            return unichr(int(code))
+            return unichr(int(line.split()[0]))
         for para in paras(sys.stdin):
             text = ''.join(line_to_character(line) for line in para)
             labeled = label(text, wapiti_process, elman_model, vocab_model)
