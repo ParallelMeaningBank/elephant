@@ -19,6 +19,8 @@ def paras(src):
     current = []
     while True:
         line = src.readline()
+        if not line:
+            break
         if line.strip() == "":
             yield current
             current = []
