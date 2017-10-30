@@ -50,7 +50,8 @@ def create_tmp_file(iob_file):
     fd = open(tmp_file, 'w')
     # TODO We run a new elman process for each sequence. This is quite slow. Is
     # there a better way?
-    for text, labels in sequences:
+    for i, (text, labels) in enumerate(sequences):
+        print >> sys.stderr, 'featurizing sequence {}'.format(i + 1)
         if elman_model: # Add rnn features
             for (ch, features, label) in zip(text, elephant.augment(text, elman_model, replace), labels):
                 fd.write('{0} {1} {2} {3}\n'.format(ord(ch), ud.category(ch), features, label))
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     # prepare output directory
     makedirs(model_dir)
     if elman_model:
-        shutil.copy(elman_model, model_dir)
+        shutil.copy(elman_model, os.path.join(model_dir, 'elman'))
     tmp_input_file = create_tmp_file(input_iob_file)
     if devel_iob_file:
         tmp_devel_file = create_tmp_file(devel_iob_file)
@@ -105,7 +106,7 @@ if __name__ == '__main__':
             wapiti_pattern_file, tmp_input_file, wapiti_model]
     if devel_iob_file:
         command.append('--devel')
-        command.append(temp_devel_file)
+        command.append(tmp_devel_file)
         command.append('--stopwin')
         command.append('20')
     subprocess.call(command)
