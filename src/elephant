@@ -157,7 +157,6 @@ def output_labels(labeled, iob=False, first = True):
     if iob:
         for ch, label in labeled:
             out.write(u'{0}\t{1}\n'.format(int(ch), label))
-        out.write(u'\n')
     else:
         first = first
         for ch, label in labeled:
